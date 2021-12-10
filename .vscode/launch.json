@@ -22,6 +22,34 @@
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ]
+        },
+        {
+            "name": "balance",
+            "type": "pwa-node",
+            "request": "launch",
+            "runtimeArgs": [
+                "--nolazy"
+            ],
+            "program": "node_modules/hardhat/internal/cli/cli.js",
+            "args": [
+                "balance",
+                "--network",
+                "rinkeby",
+                "--account",
+                "0xA87f35399A63B9F9562c5e3fe2B1b4c33a4c869D"
+            ]
+        },
+        {
+            "name": "test",
+            "type": "pwa-node",
+            "request": "launch",
+            "runtimeArgs": [
+                "--nolazy"
+            ],
+            "program": "node_modules/hardhat/internal/cli/cli.js",
+            "args": [
+                "test"
+            ]
         }
     ]
 }
