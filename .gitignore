@@ -10,3 +10,10 @@ artifacts
 
 # TSC
 dist
+
+# IDEs
+/.idea
+
+#System Files
+.DS_Store
+Thumbs.db

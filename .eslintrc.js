@@ -20,5 +20,13 @@ module.exports = {
       "error",
       { ignores: ["modules"] },
     ],
+    "node/no-missing-import": [
+      "error",
+      {
+        allowModules: [],
+        resolvePaths: ["typechain"],
+        tryExtensions: [".ts", ".js", ".json", ".node"],
+      },
+    ],
   },
 };
