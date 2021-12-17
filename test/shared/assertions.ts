@@ -25,8 +25,8 @@ export function near(chai: Chai.ChaiStatic): void {
       delta.lte(EPSILON),
       "expected #{exp} to be near #{act}",
       "expected #{exp} to not be near #{act}",
-      expected,
-      actual
+      expected.toString(),
+      actual.toString()
     );
   });
 }

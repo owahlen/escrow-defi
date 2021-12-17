@@ -6,11 +6,14 @@ contract Escrow {
     address payable public seller;
     address payable public buyer;
 
+    // price * collateralFactor must be provided as collateral
+    uint constant public collateralFactor = 2;
+
     enum State {
-        Created,
-        Locked,
-        Released,
-        Inactive
+        Inactive,
+        Priced,
+        Paid,
+        Settled
     } // 0, 1, 2, 3
     // The state variable has a default value of the first member, `State.Created`
     State public state;
@@ -22,9 +25,7 @@ contract Escrow {
     error OnlySeller();
     /// The function cannot be called at the current state.
     error InvalidState();
-    /// The provided value has to be even.
-    error ValueNotEven();
-    /// The buyer needs to give a collateral of twice the price
+    /// The transferred escrow value does not match the price
     error InvalidCollateral();
 
     modifier onlyBuyer() {
@@ -42,77 +43,80 @@ contract Escrow {
         _;
     }
 
-    event Aborted();
-    event PurchaseConfirmed();
-    event ItemReceived();
-    event BuyerRefunded();
+    modifier secured(uint256 _price) {
+        if (_price * collateralFactor != msg.value) revert InvalidCollateral();
+        _;
+    }
+
+    event Priced();
+    event Paid();
+    event Settled();
+    event Refunded();
     event Payout();
 
     /// Step 1:
-    /// The seller constructs the contract by sending twice the
-    /// product's price as escrow
-    /// Contract starts in State.Created.
-    constructor() payable {
+    /// The seller constructs the Escrow contract
+    /// Contract starts in State.Inactive.
+    constructor() {
         seller = payable(msg.sender);
-        price = msg.value / 2;
-        if ((2 * price) != msg.value) {
-            revert ValueNotEven();
-        }
     }
 
-    /// Step 2a:
-    /// The seller abort the purchase and reclaims the ether.
-    /// Contract goes into State.Inactive.
-    function abort() public onlySeller inState(State.Created) {
-        emit Aborted();
-        state = State.Inactive;
-        seller.transfer(address(this).balance);
-    }
-
-    /// Step 2b:
-    /// A buyer confirms his desire to purchase the product
-    /// by sending twice the product's price to the escrow contract.
-    /// Contract goes into State.Locked.
-    function confirmPurchase() public payable inState(State.Created) {
-        if (msg.value != (2 * price)) {
-            revert InvalidCollateral();
-        }
-        emit PurchaseConfirmed();
-        buyer = payable(msg.sender);
-        state = State.Locked;
+    /// Step 2:
+    /// The seller sets the product price and sends twice the product's price as escrow.
+    /// Contract goes into in State.Priced.
+    function setPrice(uint256 _price) public payable onlySeller inState(State.Inactive) secured(_price) {
+        emit Priced();
+        price = _price;
+        state = State.Priced;
     }
 
     /// Step 3a:
-    /// The buyer confirms that he has received the product.
-    /// In this case he receives the product price back that he has paid twice before.
-    /// Contract goes into State.Released
-    function confirmReceived() public onlyBuyer inState(State.Locked) {
-        emit ItemReceived();
-        state = State.Released;
-        buyer.transfer(price); // Buyer receive 1 x value here
-    }
+    /// The seller aborts the purchase and reclaims his ether by calling payout (see below).
 
     /// Step 3b:
+    /// A buyer pays the priced product and secures the transaction
+    /// by sending price * collateralFactor to the contract.
+    /// Contract stores the buyer and goes into State.Paid.
+    function pay() public payable inState(State.Priced) secured(price) {
+        emit Paid();
+        buyer = payable(msg.sender);
+        state = State.Paid;
+    }
+
+    /// Step 4a:
+    /// The buyer confirms that he/she has received the product.
+    /// In this case he/she receives the collateral back that has been paid on top of the price.
+    /// Contract goes into State.Settled
+    function confirmReceived() public onlyBuyer inState(State.Paid) {
+        emit Settled();
+        state = State.Settled;
+        buyer.transfer(price * (collateralFactor - 1));
+    }
+
+    /// Step 4b:
     /// If the product is not received by the buyer the seller can refund him.
     /// The buyer receives the 2*price he has paid to the escrow contract back.
-    /// Contract goes back into State.Created
-    function refundBuyer() public onlySeller inState(State.Locked) {
-        emit BuyerRefunded();
-        state = State.Created;
+    /// Contract goes back into State.Priced
+    function refund() public onlySeller inState(State.Paid) {
+        emit Refunded();
+        state = State.Priced;
         address payable _recipient = buyer;
         buyer = payable(0);
         // the transfer function reverts the state in case of errors
-        _recipient.transfer(2 * price);
+        _recipient.transfer(price * collateralFactor);
     }
 
-    /// Step 4:
+    /// Step 3a and 5:
     /// After the buyer has confirmed reception of the product the seller can
     /// take out the remaining funds in the escrow which is his
     /// compound (2*price) + the payment of the buyer (1*price)
     /// Contract goes into State.Inactive
-    function payout() public onlySeller inState(State.Released) {
+    function payout() public onlySeller {
+        if (state != State.Priced && state != State.Settled) {
+            revert InvalidState();
+        }
         emit Payout();
         state = State.Inactive;
-        seller.transfer(3 * price);
+        seller.transfer(address(this).balance);
     }
 }
