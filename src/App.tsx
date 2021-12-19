@@ -2,6 +2,9 @@ import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
 
+// https://github.com/PatrickAlphaC/defi-stake-yield-brownie/tree/main/front_end
+// https://github.com/steadylearner/blockchain/tree/main/real/eth
+
 function App() {
   return (
     <div className="App">
