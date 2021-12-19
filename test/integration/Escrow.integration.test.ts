@@ -20,12 +20,13 @@ describe("Escrow Integration", function () {
   const price = ethers.utils.parseEther("0.1");
 
   before(async function () {
-    if (isLocalChain()) {
-      this.skip();
-    } else {
-      console.log("Testing on testnet: '%s'", hre.network.name);
-      provider = hre.ethers.provider;
-    }
+    // if (isLocalChain()) {
+    //  this.skip();
+    // } else {
+    //  ...
+    // }
+    console.log("Testing on testnet: '%s'", hre.network.name);
+    provider = hre.ethers.provider;
   });
 
   step(
@@ -67,11 +68,15 @@ describe("Escrow Integration", function () {
 
   step("should verify 'Escrow' contract on Etherscan", async function () {
     // setup:
-    console.log("Verifying 'Escrow' contract on Etherscan...");
-    const deployTx = escrow.deployTransaction;
-    await deployTx.wait(3);
-    // when/then (should not throw)
-    await verifyOnEtherscan(escrow);
+    if (isLocalChain()) {
+      console.log("Skipping Etherscan verification on local chain.");
+    } else {
+      console.log("Verifying 'Escrow' contract on Etherscan...");
+      const deployTx = escrow.deployTransaction;
+      await deployTx.wait(3);
+      // when/then (should not throw)
+      await verifyOnEtherscan(escrow);
+    }
   });
 
   step("should execute 'setPrice'.", async function () {
