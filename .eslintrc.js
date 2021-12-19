@@ -25,7 +25,7 @@ module.exports = {
       {
         allowModules: [],
         resolvePaths: ["typechain"],
-        tryExtensions: [".ts", ".js", ".json", ".node"],
+        tryExtensions: [".ts", ".tsx", ".js", ".json", ".node"],
       },
     ],
   },
