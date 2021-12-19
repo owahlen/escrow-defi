@@ -40,6 +40,13 @@
     "typescript": "^4.5.2"
   },
   "scripts": {
-    "test": "hardhat test"
+    "compile": "npx hardhat compile",
+    "test": "hardhat test",
+    "serve": "npx hardhat node",
+    "deploy": "npx hardhat run scripts/deploy.js --network localhost",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "ftest": "react-scripts test",
+    "eject": "react-scripts eject"
   }
 }
