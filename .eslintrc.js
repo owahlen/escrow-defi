@@ -1,9 +1,11 @@
 module.exports = {
   env: {
-    browser: false,
+    browser: true,
+    commonjs: true,
+    node: true,
     es2021: true,
     mocha: true,
-    node: true,
+    jest: true,
   },
   plugins: ["@typescript-eslint"],
   extends: [
@@ -28,5 +30,7 @@ module.exports = {
         tryExtensions: [".ts", ".tsx", ".js", ".json", ".node"],
       },
     ],
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": "warn",
   },
 };
