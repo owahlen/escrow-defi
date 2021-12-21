@@ -28,11 +28,7 @@ export const Header = () => {
         <Button
           color="primary"
           variant="contained"
-          onClick={() =>
-            activateBrowserWallet((error: Error) => {
-              console.log(error);
-            })
-          }
+          onClick={() => activateBrowserWallet()}
         >
           Connect
         </Button>
