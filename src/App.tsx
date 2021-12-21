@@ -1,29 +1,29 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
+import map from "./chain-info/map.json";
 
 // https://github.com/PatrickAlphaC/defi-stake-yield-brownie/tree/main/front_end
 // https://github.com/steadylearner/blockchain/tree/main/real/eth
+import { Config, DAppProvider, Hardhat, Mainnet } from "@usedapp/core";
+import { Main } from "./fragments/Main";
+import { Header } from "./fragments/Header";
+import { Container } from "@mui/material";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const config: Config = {
+  readOnlyChainId: Mainnet.chainId,
+  networks: [Hardhat],
+  multicallAddresses: {
+    [Hardhat.chainId]: map.contracts.Multicall.address,
+  },
+};
+
+const App = () => (
+  <DAppProvider config={config}>
+    <Header />
+    <Container maxWidth="md">
+      <Main />
+    </Container>
+  </DAppProvider>
+);
 
 export default App;
