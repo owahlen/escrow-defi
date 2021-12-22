@@ -1,27 +1,22 @@
 import React, { useEffect, useState } from "react";
-import Box from "@mui/material/Box";
-import { ethers } from "ethers";
 import { useEthers } from "@usedapp/core";
-import map from "../chain-info/map.json";
 import Typography from "@mui/material/Typography";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import { ContractDetails } from "./ContractDetails";
+import { useEscrowState } from "../hooks/useEscrowState";
+import { useEscrowBalance } from "../hooks/useEscrowBalance";
+import { usePrice } from "../hooks/usePrice";
+import { getContractAddress } from "../blockchain/contract-utils";
 
 export const Main = () => {
   const { chainId, error } = useEthers();
-  console.log("ChainId: ", chainId);
 
   const [showNetworkError, setShowNetworkError] = useState(false);
 
-  const handleCloseNetworkError = (
-    event: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    showNetworkError && setShowNetworkError(false);
-  };
+  const escrowBalance = useEscrowBalance();
+  const price = usePrice();
+  const escrowState = useEscrowState();
 
   /**
    * useEthers will return a populated 'error' field when something has gone wrong.
@@ -36,10 +31,17 @@ export const Main = () => {
     }
   }, [error, showNetworkError]);
 
-  const contract = new ethers.Contract(
-    map.contracts.Escrow.address,
-    map.contracts.Escrow.abi
-  );
+  const handleCloseNetworkError = (
+    event: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    showNetworkError && setShowNetworkError(false);
+  };
+
+  const escrowAddress = getContractAddress(chainId, "Escrow");
 
   return (
     <>
@@ -54,9 +56,12 @@ export const Main = () => {
       >
         Car Sale
       </Typography>
-      <Box sx={{ color: "common.white", textAlign: "center", p: 4 }}>
-        Loaded Escrow contract into address {contract.address}
-      </Box>
+      <ContractDetails
+        address={escrowAddress}
+        balance={escrowBalance}
+        price={price}
+        escrowState={escrowState}
+      />
       <Snackbar
         open={showNetworkError}
         autoHideDuration={5000}
