@@ -9,6 +9,7 @@ const stateStringMap = new Map<number | undefined, string>([
 ]);
 
 interface ContractDetailsProps {
+  chainId?: number;
   address?: string;
   balance?: number;
   price?: number;
@@ -16,6 +17,7 @@ interface ContractDetailsProps {
 }
 
 export const ContractDetails = ({
+  chainId,
   address,
   balance,
   price,
@@ -25,6 +27,9 @@ export const ContractDetails = ({
   return (
     <Box sx={{ color: "common.white", textAlign: "center", p: 4 }}>
       <h1>Contract Details</h1>
+      <p>
+        <b>chain ID:</b> {chainId}
+      </p>
       <p>
         <b>address:</b> {address}
       </p>

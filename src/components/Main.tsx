@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useEthers } from "@usedapp/core";
+import { Chain, useEthers } from "@usedapp/core";
 import Typography from "@mui/material/Typography";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
@@ -9,7 +9,7 @@ import { useEscrowBalance } from "../hooks/useEscrowBalance";
 import { usePrice } from "../hooks/usePrice";
 import { getContractAddress } from "../blockchain/contract-utils";
 
-export const Main = () => {
+export const Main = ({ supportedChains }: { supportedChains: Chain[] }) => {
   const { chainId, error } = useEthers();
 
   const [showNetworkError, setShowNetworkError] = useState(false);
@@ -57,6 +57,7 @@ export const Main = () => {
         Car Sale
       </Typography>
       <ContractDetails
+        chainId={chainId}
         address={escrowAddress}
         balance={escrowBalance}
         price={price}
@@ -68,7 +69,10 @@ export const Main = () => {
         onClose={handleCloseNetworkError}
       >
         <Alert onClose={handleCloseNetworkError} severity="warning">
-          You have to connect to the Hardhat network!
+          You have to connect your wallet to one of the supported networks:{" "}
+          {supportedChains
+            .map((c) => c.chainName + "(" + c.chainId + ")")
+            .join(", ")}
         </Alert>
       </Snackbar>
     </>
