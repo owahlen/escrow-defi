@@ -25,23 +25,48 @@ export const ContractDetails = ({
 }: ContractDetailsProps) => {
   const stateString = stateStringMap.get(escrowState);
   return (
-    <Box sx={{ color: "common.white", textAlign: "center", p: 4 }}>
-      <h1>Contract Details</h1>
-      <p>
-        <b>chain ID:</b> {chainId}
-      </p>
-      <p>
-        <b>address:</b> {address}
-      </p>
-      <p>
-        <b>balance:</b> {balance}
-      </p>
-      <p>
-        <b>price:</b> {price}
-      </p>
-      <p>
-        <b>state:</b> {stateString}
-      </p>
+    <Box>
+      <h1 style={{ color: "white" }}>Contract Details</h1>
+      <Box
+        sx={{
+          backgroundColor: "common.white",
+          borderRadius: "25px",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 4,
+          }}
+        >
+          <Box
+            sx={{
+              display: "inline-grid",
+              gridTemplateColumns: "auto",
+              gap: 1,
+              alignItems: "center",
+            }}
+          >
+            <p>
+              <b>chain ID:</b> {chainId}
+            </p>
+            <p>
+              <b>address:</b> {address}
+            </p>
+            <p>
+              <b>balance:</b> {balance}
+            </p>
+            <p>
+              <b>price:</b> {price}
+            </p>
+            <p>
+              <b>state:</b> {stateString}
+            </p>
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 };
