@@ -1,12 +1,13 @@
 import { useContractCall, useEthers } from "@usedapp/core";
-import { prepareCall } from "../blockchain/contract-utils";
+import { prepareContractCall } from "../blockchain/contract-utils";
+import { utils } from "ethers";
 
 /**
  * Get the price configured in the escrow
  */
-export const usePrice = (): number | undefined => {
+export const usePrice = (): string | undefined => {
   const { chainId } = useEthers();
-  const call = prepareCall(chainId, "Escrow", "price", []);
+  const call = prepareContractCall(chainId, "Escrow", "price", []);
   const [price] = useContractCall(call) ?? [];
-  return price?.toNumber();
+  return price ? utils.formatEther(price) : undefined;
 };

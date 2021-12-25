@@ -17,10 +17,10 @@ export const Header = () => {
     >
       {isConnected ? (
         <>
-          <Button color="primary" variant="contained">
+          <Button color="secondary" variant="contained">
             {`${account?.slice(0, 5)}...${account?.slice(-4)}`}
           </Button>
-          <Button variant="contained" onClick={deactivate}>
+          <Button color="primary" variant="contained" onClick={deactivate}>
             Disconnect
           </Button>
         </>

@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { ContractDetails } from "./ContractDetails";
+import { ContractActions } from "./ContractActions";
 import { useEscrowState } from "../hooks/useEscrowState";
 import { useEscrowBalance } from "../hooks/useEscrowBalance";
 import { usePrice } from "../hooks/usePrice";
@@ -57,6 +58,13 @@ export const Main = ({ supportedChains }: { supportedChains: Chain[] }) => {
         Car Sale
       </Typography>
       <ContractDetails
+        chainId={chainId}
+        address={escrowAddress}
+        balance={escrowBalance}
+        price={price}
+        escrowState={escrowState}
+      />
+      <ContractActions
         chainId={chainId}
         address={escrowAddress}
         balance={escrowBalance}

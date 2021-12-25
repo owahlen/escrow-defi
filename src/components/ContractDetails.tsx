@@ -11,8 +11,8 @@ const stateStringMap = new Map<number | undefined, string>([
 interface ContractDetailsProps {
   chainId?: number;
   address?: string;
-  balance?: number;
-  price?: number;
+  balance?: string;
+  price?: string;
   escrowState?: number;
 }
 
@@ -25,46 +25,50 @@ export const ContractDetails = ({
 }: ContractDetailsProps) => {
   const stateString = stateStringMap.get(escrowState);
   return (
-    <Box>
-      <h1 style={{ color: "white" }}>Contract Details</h1>
+    <Box
+      sx={{
+        backgroundColor: "common.white",
+        borderRadius: "25px",
+        marginBlockStart: "1.0em",
+        marginBlockEnd: "1.0em",
+      }}
+    >
       <Box
         sx={{
-          backgroundColor: "common.white",
-          borderRadius: "25px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 4,
+          p: 4,
         }}
       >
         <Box
+          component="img"
           sx={{
-            display: "flex",
-            flexDirection: "column",
+            height: 442,
+            width: 612,
+            maxHeight: { xs: 233, md: 167 },
+            maxWidth: { xs: 350, md: 250 },
+          }}
+          alt="Car for sale."
+          src="car.jpeg"
+        />
+        <Box
+          sx={{
+            display: "inline-grid",
+            gridTemplateColumns: "auto auto",
+            gap: 1,
             alignItems: "center",
-            gap: 4,
           }}
         >
-          <Box
-            sx={{
-              display: "inline-grid",
-              gridTemplateColumns: "auto",
-              gap: 1,
-              alignItems: "center",
-            }}
-          >
-            <p>
-              <b>chain ID:</b> {chainId}
-            </p>
-            <p>
-              <b>address:</b> {address}
-            </p>
-            <p>
-              <b>balance:</b> {balance}
-            </p>
-            <p>
-              <b>price:</b> {price}
-            </p>
-            <p>
-              <b>state:</b> {stateString}
-            </p>
-          </Box>
+          <Box sx={{ fontWeight: "bold" }}>Car price:</Box>
+          <Box>{price} ETH</Box>
+          <Box sx={{ fontWeight: "bold" }}>Escrow balance:</Box>
+          <Box>{balance} ETH</Box>
+          <Box sx={{ fontWeight: "bold" }}>Contract address:</Box>
+          <Box>{address}</Box>
+          <Box sx={{ fontWeight: "bold" }}>Contract state:</Box>
+          <Box>{stateString}</Box>
         </Box>
       </Box>
     </Box>

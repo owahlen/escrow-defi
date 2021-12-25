@@ -1,7 +1,7 @@
-import { utils } from "ethers";
+import { Contract, utils } from "ethers";
 import { getDeployedContract } from "../chain-info/deployment";
 
-export const prepareCall = (
+export const prepareContractCall = (
   chainId: number | undefined,
   contractName: string,
   method: string,
@@ -10,17 +10,33 @@ export const prepareCall = (
   if (!chainId) {
     return false;
   }
-  const contract = getDeployedContract(contractName, chainId);
-  const escrowInterface = contract
-    ? new utils.Interface(contract.abi)
+  const deployedContract = getDeployedContract(contractName, chainId);
+  const contractCallInterface = deployedContract
+    ? new utils.Interface(deployedContract.abi)
     : undefined;
-  return escrowInterface
+  return contractCallInterface
     ? {
-        abi: escrowInterface,
-        address: contract!.address,
+        abi: contractCallInterface,
+        address: deployedContract!.address,
         method: method,
         args: args,
       }
+    : false;
+};
+
+export const prepareContract = (
+  chainId: number | undefined,
+  contractName: string
+) => {
+  if (!chainId) {
+    return false;
+  }
+  const deployedContract = getDeployedContract(contractName, chainId);
+  return deployedContract
+    ? new Contract(
+        deployedContract.address,
+        new utils.Interface(deployedContract.abi)
+      )
     : false;
 };
 
