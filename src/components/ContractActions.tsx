@@ -1,44 +1,20 @@
 import Box from "@mui/material/Box";
 import React from "react";
 import { InactiveAction } from "./InactiveAction";
+import { PricedAction } from "./PricedAction";
+import { useEscrowState } from "../hooks/useEscrowState";
+import { useEscrowAddress } from "../hooks/useEscrowAddress";
+import { PaidAction } from "./PaidAction";
+import { SettledAction } from "./SettledAction";
 
-interface ContractActionsProps {
-  chainId?: number;
-  address?: string;
-  balance?: string;
-  price?: string;
-  escrowState?: number;
-}
+export const ContractActions = () => {
+  const escrowState = useEscrowState();
+  const escrowAddress = useEscrowAddress();
 
-export const ContractActions = ({
-  chainId,
-  address,
-  balance,
-  price,
-  escrowState,
-}: ContractActionsProps) => {
-  let actionComponent;
-  if (!address) {
-    actionComponent = <></>;
-  } else {
-    switch (escrowState) {
-      case 0: // Inactive
-        actionComponent = InactiveAction({ address });
-        break;
-      /*     case 1: // Priced
-      actionComponent = PricedAction();
-      break;
-    case 2: // Paid
-      actionComponent = PaidAction();
-      break;
-    case 3: // Settled
-      actionComponent = SettledAction();
-      break; */
-      default:
-        // undefined
-        actionComponent = <></>;
-    }
+  if (!escrowAddress) {
+    return null;
   }
+
   return (
     <Box
       sx={{
@@ -57,7 +33,10 @@ export const ContractActions = ({
           p: 4,
         }}
       >
-        {actionComponent}
+        {escrowState === 0 && <InactiveAction />}
+        {escrowState === 1 && <PricedAction />}
+        {escrowState === 2 && <PaidAction />}
+        {escrowState === 3 && <SettledAction />}
       </Box>
     </Box>
   );

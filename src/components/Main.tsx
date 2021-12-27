@@ -5,19 +5,11 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { ContractDetails } from "./ContractDetails";
 import { ContractActions } from "./ContractActions";
-import { useEscrowState } from "../hooks/useEscrowState";
-import { useEscrowBalance } from "../hooks/useEscrowBalance";
-import { usePrice } from "../hooks/usePrice";
-import { getContractAddress } from "../blockchain/contract-utils";
 
 export const Main = ({ supportedChains }: { supportedChains: Chain[] }) => {
-  const { chainId, error } = useEthers();
+  const { error } = useEthers();
 
   const [showNetworkError, setShowNetworkError] = useState(false);
-
-  const escrowBalance = useEscrowBalance();
-  const price = usePrice();
-  const escrowState = useEscrowState();
 
   /**
    * useEthers will return a populated 'error' field when something has gone wrong.
@@ -42,8 +34,6 @@ export const Main = ({ supportedChains }: { supportedChains: Chain[] }) => {
     showNetworkError && setShowNetworkError(false);
   };
 
-  const escrowAddress = getContractAddress(chainId, "Escrow");
-
   return (
     <>
       <Typography
@@ -57,20 +47,8 @@ export const Main = ({ supportedChains }: { supportedChains: Chain[] }) => {
       >
         Car Sale
       </Typography>
-      <ContractDetails
-        chainId={chainId}
-        address={escrowAddress}
-        balance={escrowBalance}
-        price={price}
-        escrowState={escrowState}
-      />
-      <ContractActions
-        chainId={chainId}
-        address={escrowAddress}
-        balance={escrowBalance}
-        price={price}
-        escrowState={escrowState}
-      />
+      <ContractDetails />
+      <ContractActions />
       <Snackbar
         open={showNetworkError}
         autoHideDuration={5000}

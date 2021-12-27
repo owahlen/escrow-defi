@@ -1,5 +1,11 @@
 import Box from "@mui/material/Box";
 import React from "react";
+import { useEthers } from "@usedapp/core";
+import { useEscrowState } from "../hooks/useEscrowState";
+import { getContractAddress } from "../blockchain/contract-utils";
+import { useEscrowBalance } from "../hooks/useEscrowBalance";
+import { usePrice } from "../hooks/usePrice";
+import { utils } from "ethers";
 
 const stateStringMap = new Map<number | undefined, string>([
   [0, "Inactive"],
@@ -8,21 +14,13 @@ const stateStringMap = new Map<number | undefined, string>([
   [3, "Settled"],
 ]);
 
-interface ContractDetailsProps {
-  chainId?: number;
-  address?: string;
-  balance?: string;
-  price?: string;
-  escrowState?: number;
-}
+export const ContractDetails = () => {
+  const { chainId } = useEthers();
+  const balance = useEscrowBalance();
+  const price = usePrice();
+  const escrowState = useEscrowState();
+  const address = getContractAddress(chainId, "Escrow");
 
-export const ContractDetails = ({
-  chainId,
-  address,
-  balance,
-  price,
-  escrowState,
-}: ContractDetailsProps) => {
   const stateString = stateStringMap.get(escrowState);
   return (
     <Box
@@ -62,7 +60,7 @@ export const ContractDetails = ({
           }}
         >
           <Box sx={{ fontWeight: "bold" }}>Car price:</Box>
-          <Box>{price} ETH</Box>
+          <Box>{price ? utils.formatEther(price) : undefined} ETH</Box>
           <Box sx={{ fontWeight: "bold" }}>Escrow balance:</Box>
           <Box>{balance} ETH</Box>
           <Box sx={{ fontWeight: "bold" }}>Contract address:</Box>

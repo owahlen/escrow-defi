@@ -6,36 +6,11 @@ import { useSetPrice } from "../hooks/useSetPrice";
 import { useNotifications } from "@usedapp/core";
 import { utils } from "ethers";
 
-interface InactiveActionsProps {
-  address: string;
-}
-
-export const InactiveAction = ({ address }: InactiveActionsProps) => {
+export const InactiveAction = () => {
   const { notifications } = useNotifications();
-  const [price, setPrice] = useState("");
+  const [priceEth, setPriceEth] = useState("");
   const { send: setPriceSend, state: setPriceState } = useSetPrice();
-
-  const handleChange = (
-    v: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const value = v.target.value;
-    const regex = /^([0-9]*|[0-9]+\.[0-9]*)$/;
-    if (value.match(regex)) {
-      setPrice(value);
-    }
-  };
-
-  const handleSetPriceClick = () => {
-    const priceWei = utils.parseEther(price);
-    const collateralWei = priceWei.mul(2);
-    setPriceSend(priceWei, { value: collateralWei });
-  };
-
   const [showSetPriceSuccess, setShowSetPriceSuccess] = useState(false);
-
-  const handleCloseSnack = () => {
-    showSetPriceSuccess && setShowSetPriceSuccess(false);
-  };
 
   useEffect(() => {
     if (
@@ -49,6 +24,26 @@ export const InactiveAction = ({ address }: InactiveActionsProps) => {
     }
   }, [notifications, showSetPriceSuccess]);
 
+  const handleChange = (
+    v: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const value = v.target.value;
+    const regex = /^([0-9]*|[0-9]+\.[0-9]*)$/;
+    if (value.match(regex)) {
+      setPriceEth(value);
+    }
+  };
+
+  const handleSetPriceClick = () => {
+    const priceWei = utils.parseEther(priceEth);
+    const collateralWei = priceWei.mul(2);
+    setPriceSend(priceWei, { value: collateralWei });
+  };
+
+  const handleCloseSnack = () => {
+    showSetPriceSuccess && setShowSetPriceSuccess(false);
+  };
+
   const isMining = setPriceState.status === "Mining";
 
   return (
@@ -61,7 +56,7 @@ export const InactiveAction = ({ address }: InactiveActionsProps) => {
         <TextField
           id="price"
           label="Set the car price"
-          value={price}
+          value={priceEth}
           onChange={(v) => handleChange(v)}
         />
         <Button
@@ -69,14 +64,14 @@ export const InactiveAction = ({ address }: InactiveActionsProps) => {
           color="primary"
           variant="contained"
           onClick={() => handleSetPriceClick()}
-          disabled={price === "" || isMining}
+          disabled={priceEth === "" || isMining}
         >
           Set Price
         </Button>
         {isMining ? (
           <CircularProgress size={26} />
         ) : (
-          `Setting price to ${price}`
+          `Setting price to ${priceEth}`
         )}
       </Box>
       <Snackbar
