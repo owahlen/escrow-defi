@@ -1,62 +1,122 @@
 {
-  "31337": {
-    "localhost": {
-      "name": "localhost",
-      "chainId": "31337",
+  "4": {
+    "rinkeby": {
+      "name": "rinkeby",
+      "chainId": "4",
       "contracts": {
-        "Multicall": {
-          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "Escrow": {
+          "address": "0x123B24a6542813c105123811B4ec0BBc7FEaF862",
           "abi": [
             {
-              "inputs": [
+              "inputs": [],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "inputs": [],
+              "name": "InvalidCollateral",
+              "type": "error"
+            },
+            {
+              "inputs": [],
+              "name": "InvalidState",
+              "type": "error"
+            },
+            {
+              "inputs": [],
+              "name": "OnlyBuyer",
+              "type": "error"
+            },
+            {
+              "inputs": [],
+              "name": "OnlySeller",
+              "type": "error"
+            },
+            {
+              "anonymous": false,
+              "inputs": [],
+              "name": "Paid",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [],
+              "name": "Payout",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [],
+              "name": "Priced",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [],
+              "name": "Refunded",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [],
+              "name": "Settled",
+              "type": "event"
+            },
+            {
+              "inputs": [],
+              "name": "buyer",
+              "outputs": [
                 {
-                  "components": [
-                    {
-                      "internalType": "address",
-                      "name": "target",
-                      "type": "address"
-                    },
-                    {
-                      "internalType": "bytes",
-                      "name": "callData",
-                      "type": "bytes"
-                    }
-                  ],
-                  "internalType": "struct Multicall.Call[]",
-                  "name": "calls",
-                  "type": "tuple[]"
+                  "internalType": "address payable",
+                  "name": "",
+                  "type": "address"
                 }
               ],
-              "name": "aggregate",
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "collateralFactor",
               "outputs": [
                 {
                   "internalType": "uint256",
-                  "name": "blockNumber",
+                  "name": "",
                   "type": "uint256"
-                },
-                {
-                  "internalType": "bytes[]",
-                  "name": "returnData",
-                  "type": "bytes[]"
                 }
               ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "confirmReceived",
+              "outputs": [],
               "stateMutability": "nonpayable",
               "type": "function"
             },
             {
-              "inputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "blockNumber",
-                  "type": "uint256"
-                }
-              ],
-              "name": "getBlockHash",
+              "inputs": [],
+              "name": "pay",
+              "outputs": [],
+              "stateMutability": "payable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "payout",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "price",
               "outputs": [
                 {
-                  "internalType": "bytes32",
-                  "name": "blockHash",
-                  "type": "bytes32"
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
                 }
               ],
               "stateMutability": "view",
@@ -64,51 +124,19 @@
             },
             {
               "inputs": [],
-              "name": "getCurrentBlockCoinbase",
+              "name": "refund",
+              "outputs": [],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "seller",
               "outputs": [
                 {
-                  "internalType": "address",
-                  "name": "coinbase",
+                  "internalType": "address payable",
+                  "name": "",
                   "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "getCurrentBlockDifficulty",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "difficulty",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "getCurrentBlockGasLimit",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "gaslimit",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "getCurrentBlockTimestamp",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "timestamp",
-                  "type": "uint256"
                 }
               ],
               "stateMutability": "view",
@@ -117,37 +145,39 @@
             {
               "inputs": [
                 {
-                  "internalType": "address",
-                  "name": "addr",
-                  "type": "address"
-                }
-              ],
-              "name": "getEthBalance",
-              "outputs": [
-                {
                   "internalType": "uint256",
-                  "name": "balance",
+                  "name": "_price",
                   "type": "uint256"
                 }
               ],
-              "stateMutability": "view",
+              "name": "setPrice",
+              "outputs": [],
+              "stateMutability": "payable",
               "type": "function"
             },
             {
               "inputs": [],
-              "name": "getLastBlockHash",
+              "name": "state",
               "outputs": [
                 {
-                  "internalType": "bytes32",
-                  "name": "blockHash",
-                  "type": "bytes32"
+                  "internalType": "enum Escrow.State",
+                  "name": "",
+                  "type": "uint8"
                 }
               ],
               "stateMutability": "view",
               "type": "function"
             }
           ]
-        },
+        }
+      }
+    }
+  },
+  "31337": {
+    "localhost": {
+      "name": "localhost",
+      "chainId": "31337",
+      "contracts": {
         "Escrow": {
           "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
           "abi": [
@@ -307,6 +337,150 @@
                   "internalType": "enum Escrow.State",
                   "name": "",
                   "type": "uint8"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            }
+          ]
+        },
+        "Multicall": {
+          "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+          "abi": [
+            {
+              "inputs": [
+                {
+                  "components": [
+                    {
+                      "internalType": "address",
+                      "name": "target",
+                      "type": "address"
+                    },
+                    {
+                      "internalType": "bytes",
+                      "name": "callData",
+                      "type": "bytes"
+                    }
+                  ],
+                  "internalType": "struct Multicall.Call[]",
+                  "name": "calls",
+                  "type": "tuple[]"
+                }
+              ],
+              "name": "aggregate",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "blockNumber",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes[]",
+                  "name": "returnData",
+                  "type": "bytes[]"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "blockNumber",
+                  "type": "uint256"
+                }
+              ],
+              "name": "getBlockHash",
+              "outputs": [
+                {
+                  "internalType": "bytes32",
+                  "name": "blockHash",
+                  "type": "bytes32"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "getCurrentBlockCoinbase",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "coinbase",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "getCurrentBlockDifficulty",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "difficulty",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "getCurrentBlockGasLimit",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "gaslimit",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "getCurrentBlockTimestamp",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "timestamp",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "addr",
+                  "type": "address"
+                }
+              ],
+              "name": "getEthBalance",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "balance",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "getLastBlockHash",
+              "outputs": [
+                {
+                  "internalType": "bytes32",
+                  "name": "blockHash",
+                  "type": "bytes32"
                 }
               ],
               "stateMutability": "view",

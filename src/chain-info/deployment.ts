@@ -31,20 +31,20 @@ export const getDeployedContract = (
 ): DeployedContract | undefined => {
   const chainIdString = String(chainId);
   if (!(chainIdString in chainMap)) {
-    console.error(`No deployments exist on chainId ${chainId}`);
+    console.warn(`No deployments exist on chain id ${chainId}.`);
     return undefined;
   }
   const networkMap = chainMap[chainIdString];
   const networks = Object.keys(networkMap);
   if (networks.length !== 1) {
-    console.error(`No unique networks is associated with chainId ${chainId}`);
+    console.warn(`No unique networks is associated with chain id ${chainId}.`);
     return undefined;
   }
   const network = networkMap[networks[0]];
   const contractMap = network.contracts;
   if (!(name in contractMap)) {
-    console.error(
-      `Contract ${name} is not deployed on chain with id ${chainId} and network '${network}'`
+    console.warn(
+      `Contract '${name}' is not deployed on network '${network.name}' (chain id ${chainId}).`
     );
     return undefined;
   }

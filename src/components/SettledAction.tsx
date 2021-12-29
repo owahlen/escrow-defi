@@ -65,6 +65,10 @@ export const SettledAction = () => {
 
   const isOwner = account === seller;
   const payoutTxStatus = payoutState.status;
+  const disableInputs =
+    uiTransactionStatus === "transacting" ||
+    uiTransactionStatus === "succeeded" ||
+    payoutTxStatus === "Mining";
 
   return (
     <Box
@@ -79,10 +83,7 @@ export const SettledAction = () => {
             color="primary"
             variant="contained"
             onClick={() => handlePayoutClick()}
-            disabled={
-              uiTransactionStatus === "transacting" ||
-              uiTransactionStatus === "succeeded"
-            }
+            disabled={disableInputs}
           >
             Payout
           </Button>

@@ -102,6 +102,11 @@ export const PaidAction = () => {
   const isOwner = account === seller;
   const confirmReceivedTxStatus = confirmReceivedState.status;
   const refundTxStatus = refundState.status;
+  const disableInputs =
+    uiTransactionStatus === "transacting" ||
+    uiTransactionStatus === "succeeded" ||
+    confirmReceivedTxStatus === "Mining" ||
+    refundTxStatus === "Mining";
 
   return (
     <Box
@@ -116,10 +121,7 @@ export const PaidAction = () => {
             color="primary"
             variant="contained"
             onClick={() => handleRefundClick()}
-            disabled={
-              uiTransactionStatus === "transacting" ||
-              uiTransactionStatus === "succeeded"
-            }
+            disabled={disableInputs}
           >
             Refund
           </Button>
@@ -137,10 +139,7 @@ export const PaidAction = () => {
             color="primary"
             variant="contained"
             onClick={() => handleConfirmReceivedClick()}
-            disabled={
-              uiTransactionStatus === "transacting" ||
-              uiTransactionStatus === "succeeded"
-            }
+            disabled={disableInputs}
           >
             Confirm Reception
           </Button>

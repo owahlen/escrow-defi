@@ -1,0 +1,35 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/Escrow.sol": {
+      "content": "// SPDX-License-Identifier: GPL-3.0\npragma solidity >=0.8.4 <0.9.0;\n\ncontract Escrow {\n    uint256 public price; // price of the product to be sold\n    address payable public seller;\n    address payable public buyer;\n\n    // price * collateralFactor must be provided as collateral\n    uint constant public collateralFactor = 2;\n\n    enum State {\n        Inactive,\n        Priced,\n        Paid,\n        Settled\n    } // 0, 1, 2, 3\n    // The state variable has a default value of the first member, `State.Created`\n    State public state;\n\n    /// Custom errors were added in Solidity v0.8.4\n    /// Only the buyer can call this function.\n    error OnlyBuyer();\n    /// Only the seller can call this function.\n    error OnlySeller();\n    /// The function cannot be called at the current state.\n    error InvalidState();\n    /// The transferred escrow value does not match the price\n    error InvalidCollateral();\n\n    modifier onlyBuyer() {\n        if (msg.sender != buyer) revert OnlyBuyer();\n        _;\n    }\n\n    modifier onlySeller() {\n        if (msg.sender != seller) revert OnlySeller();\n        _;\n    }\n\n    modifier inState(State _state) {\n        if (state != _state) revert InvalidState();\n        _;\n    }\n\n    modifier secured(uint256 _price) {\n        if (_price * collateralFactor != msg.value) revert InvalidCollateral();\n        _;\n    }\n\n    event Priced();\n    event Paid();\n    event Settled();\n    event Refunded();\n    event Payout();\n\n    /// Step 1:\n    /// The seller constructs the Escrow contract\n    /// Contract starts in State.Inactive.\n    constructor() {\n        seller = payable(msg.sender);\n    }\n\n    /// Step 2:\n    /// The seller sets the product price and sends twice the product's price as escrow.\n    /// Contract goes into in State.Priced.\n    function setPrice(uint256 _price) public payable onlySeller inState(State.Inactive) secured(_price) {\n        emit Priced();\n        price = _price;\n        state = State.Priced;\n    }\n\n    /// Step 3a:\n    /// The seller aborts the purchase and reclaims his ether by calling payout (see below).\n\n    /// Step 3b:\n    /// A buyer pays the priced product and secures the transaction\n    /// by sending price * collateralFactor to the contract.\n    /// Contract stores the buyer and goes into State.Paid.\n    function pay() public payable inState(State.Priced) secured(price) {\n        emit Paid();\n        buyer = payable(msg.sender);\n        state = State.Paid;\n    }\n\n    /// Step 4a:\n    /// The buyer confirms that he/she has received the product.\n    /// In this case he/she receives the collateral back that has been paid on top of the price.\n    /// Contract goes into State.Settled\n    function confirmReceived() public onlyBuyer inState(State.Paid) {\n        emit Settled();\n        state = State.Settled;\n        buyer.transfer(price * (collateralFactor - 1));\n    }\n\n    /// Step 4b:\n    /// If the product is not received by the buyer the seller can refund him.\n    /// The buyer receives the 2*price he has paid to the escrow contract back.\n    /// Contract goes back into State.Priced\n    function refund() public onlySeller inState(State.Paid) {\n        emit Refunded();\n        state = State.Priced;\n        address payable _recipient = buyer;\n        buyer = payable(0);\n        // the transfer function reverts the state in case of errors\n        _recipient.transfer(price * collateralFactor);\n    }\n\n    /// Step 3a and 5:\n    /// After the buyer has confirmed reception of the product the seller can\n    /// take out the remaining funds in the escrow which is his\n    /// compound (2*price) + the payment of the buyer (1*price)\n    /// Contract goes into State.Inactive\n    function payout() public onlySeller {\n        if (state != State.Priced && state != State.Settled) {\n            revert InvalidState();\n        }\n        emit Payout();\n        price = 0;\n        state = State.Inactive;\n        seller.transfer(address(this).balance);\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

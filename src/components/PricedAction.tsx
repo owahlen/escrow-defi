@@ -103,6 +103,11 @@ export const PricedAction = () => {
   const isOwner = account === seller;
   const payoutTxStatus = payoutState.status;
   const payTxStatus = payState.status;
+  const disableInputs =
+    uiTransactionStatus === "transacting" ||
+    uiTransactionStatus === "succeeded" ||
+    payoutTxStatus === "Mining" ||
+    payTxStatus === "Mining";
 
   return (
     <Box
@@ -117,10 +122,7 @@ export const PricedAction = () => {
             color="primary"
             variant="contained"
             onClick={() => handlePayoutClick()}
-            disabled={
-              uiTransactionStatus === "transacting" ||
-              uiTransactionStatus === "succeeded"
-            }
+            disabled={disableInputs}
           >
             Payout
           </Button>
@@ -138,15 +140,12 @@ export const PricedAction = () => {
             color="primary"
             variant="contained"
             onClick={() => handlePayClick()}
-            disabled={
-              uiTransactionStatus === "transacting" ||
-              uiTransactionStatus === "succeeded"
-            }
+            disabled={disableInputs}
           >
             Pay
           </Button>
           {payTxStatus === "None" &&
-            "Pay the car price plus twice the price as collateral."}
+            "Pay the car price and on top the price as collateral."}
           {payTxStatus === "Mining" && <CircularProgress size={26} />}
           {payTxStatus === "Success" && "Sending your payment to the escrow..."}
           {(payTxStatus === "Fail" || payTxStatus === "Exception") &&

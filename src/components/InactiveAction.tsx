@@ -75,6 +75,10 @@ export const InactiveAction = () => {
 
   const isOwner = account === seller;
   const txStatus = setPriceTxState.status;
+  const disableInputs =
+    uiTransactionStatus === "transacting" ||
+    uiTransactionStatus === "succeeded" ||
+    txStatus === "Mining";
 
   return isOwner ? (
     <>
@@ -88,21 +92,14 @@ export const InactiveAction = () => {
           label="Set the car price"
           value={priceEth}
           onChange={(v) => handleChange(v)}
-          disabled={
-            uiTransactionStatus === "transacting" ||
-            uiTransactionStatus === "succeeded"
-          }
+          disabled={disableInputs}
         />
         <Button
           sx={{ display: "block", marginTop: "1em" }}
           color="primary"
           variant="contained"
           onClick={() => handleSetPriceClick()}
-          disabled={
-            priceEth === "" ||
-            uiTransactionStatus === "transacting" ||
-            uiTransactionStatus === "succeeded"
-          }
+          disabled={priceEth === "" || disableInputs}
         >
           Set Price
         </Button>
