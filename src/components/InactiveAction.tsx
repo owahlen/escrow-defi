@@ -1,28 +1,57 @@
 import Box from "@mui/material/Box";
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { Alert, CircularProgress, Snackbar, TextField } from "@mui/material";
+import React, { ChangeEvent, useContext, useEffect, useState } from "react";
+import { CircularProgress, TextField } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useSetPrice } from "../hooks/useSetPrice";
-import { useNotifications } from "@usedapp/core";
+import { useEthers, useNotifications } from "@usedapp/core";
 import { utils } from "ethers";
+import { AlertContext } from "./AlertContext";
+import { useSeller } from "../hooks/useSeller";
+
+type uiTransactionStatus = "inactive" | "transacting" | "succeeded" | "failed";
 
 export const InactiveAction = () => {
+  const { account } = useEthers();
+  const seller = useSeller();
+  const { alertSuccess, alertError } = useContext(AlertContext);
   const { notifications } = useNotifications();
   const [priceEth, setPriceEth] = useState("");
-  const { send: setPriceSend, state: setPriceState } = useSetPrice();
-  const [showSetPriceSuccess, setShowSetPriceSuccess] = useState(false);
+  const { send: setPriceSend, state: setPriceTxState } = useSetPrice();
+  const [uiTransactionStatus, setUiTransactionStatus] =
+    useState<uiTransactionStatus>("inactive");
 
   useEffect(() => {
-    if (
-      notifications.filter(
-        (notification) =>
-          notification.type === "transactionSucceed" &&
-          notification.transactionName === "Set Price"
-      ).length > 0
-    ) {
-      !showSetPriceSuccess && setShowSetPriceSuccess(true);
+    if (uiTransactionStatus === "transacting") {
+      switch (setPriceTxState.status) {
+        case "Success":
+          // wait for confirmation
+          if (
+            notifications.find(
+              (n) =>
+                n.type === "transactionSucceed" &&
+                n.receipt.transactionHash ===
+                  setPriceTxState.transaction?.hash &&
+                n.receipt.confirmations > 0
+            )
+          ) {
+            alertSuccess("Price set successfully!");
+            setUiTransactionStatus("succeeded");
+          }
+          break;
+        case "Fail":
+        case "Exception":
+          alertError("Price set failed!");
+          console.error("SetPrice failed: ", setPriceTxState.errorMessage);
+          setUiTransactionStatus("failed");
+      }
     }
-  }, [notifications, showSetPriceSuccess]);
+  }, [
+    alertError,
+    alertSuccess,
+    notifications,
+    uiTransactionStatus,
+    setPriceTxState,
+  ]);
 
   const handleChange = (
     v: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -37,16 +66,17 @@ export const InactiveAction = () => {
   const handleSetPriceClick = () => {
     const priceWei = utils.parseEther(priceEth);
     const collateralWei = priceWei.mul(2);
-    setPriceSend(priceWei, { value: collateralWei });
+    (async () => {
+      // wait for Metamask to close
+      await setPriceSend(priceWei, { value: collateralWei });
+      setUiTransactionStatus("transacting");
+    })();
   };
 
-  const handleCloseSnack = () => {
-    showSetPriceSuccess && setShowSetPriceSuccess(false);
-  };
+  const isOwner = account === seller;
+  const txStatus = setPriceTxState.status;
 
-  const isMining = setPriceState.status === "Mining";
-
-  return (
+  return isOwner ? (
     <>
       <Box
         sx={{
@@ -58,31 +88,40 @@ export const InactiveAction = () => {
           label="Set the car price"
           value={priceEth}
           onChange={(v) => handleChange(v)}
+          disabled={
+            uiTransactionStatus === "transacting" ||
+            uiTransactionStatus === "succeeded"
+          }
         />
         <Button
           sx={{ display: "block", marginTop: "1em" }}
           color="primary"
           variant="contained"
           onClick={() => handleSetPriceClick()}
-          disabled={priceEth === "" || isMining}
+          disabled={
+            priceEth === "" ||
+            uiTransactionStatus === "transacting" ||
+            uiTransactionStatus === "succeeded"
+          }
         >
           Set Price
         </Button>
-        {isMining ? (
-          <CircularProgress size={26} />
-        ) : (
-          `Setting price to ${priceEth}`
-        )}
+        {txStatus === "None" &&
+          "Set the car's price in ETH and pay twice the price as collateral."}
+        {txStatus === "Mining" && <CircularProgress size={26} />}
+        {txStatus === "Success" && "Setting the price..."}
+        {(txStatus === "Fail" || txStatus === "Exception") &&
+          "Failed to set price!"}
       </Box>
-      <Snackbar
-        open={showSetPriceSuccess}
-        autoHideDuration={5000}
-        onClose={handleCloseSnack}
-      >
-        <Alert onClose={handleCloseSnack} severity="success">
-          Price set successfully!
-        </Alert>
-      </Snackbar>
     </>
+  ) : (
+    <Box
+      sx={{
+        alignItems: "center",
+      }}
+    >
+      Only the owner of the contract can set the price. Try connecting with a
+      different account.
+    </Box>
   );
 };

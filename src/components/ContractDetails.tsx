@@ -6,6 +6,7 @@ import { getContractAddress } from "../blockchain/contract-utils";
 import { useEscrowBalance } from "../hooks/useEscrowBalance";
 import { usePrice } from "../hooks/usePrice";
 import { utils } from "ethers";
+import { useSeller } from "../hooks/useSeller";
 
 const stateStringMap = new Map<number | undefined, string>([
   [0, "Inactive"],
@@ -15,12 +16,15 @@ const stateStringMap = new Map<number | undefined, string>([
 ]);
 
 export const ContractDetails = () => {
-  const { chainId } = useEthers();
+  const { account, chainId } = useEthers();
+  const seller = useSeller();
   const balance = useEscrowBalance();
   const price = usePrice();
   const escrowState = useEscrowState();
   const address = getContractAddress(chainId, "Escrow");
 
+  const isConnected = account !== undefined;
+  const isOwner = account === seller;
   const stateString = stateStringMap.get(escrowState);
   return (
     <Box
@@ -40,34 +44,45 @@ export const ContractDetails = () => {
           p: 4,
         }}
       >
-        <Box
-          component="img"
-          sx={{
-            height: 442,
-            width: 612,
-            maxHeight: { xs: 233, md: 167 },
-            maxWidth: { xs: 350, md: 250 },
-          }}
-          alt="Car for sale."
-          src="car.jpeg"
-        />
-        <Box
-          sx={{
-            display: "inline-grid",
-            gridTemplateColumns: "auto auto",
-            gap: 1,
-            alignItems: "center",
-          }}
-        >
-          <Box sx={{ fontWeight: "bold" }}>Car price:</Box>
-          <Box>{price ? utils.formatEther(price) : undefined} ETH</Box>
-          <Box sx={{ fontWeight: "bold" }}>Escrow balance:</Box>
-          <Box>{balance} ETH</Box>
-          <Box sx={{ fontWeight: "bold" }}>Contract address:</Box>
-          <Box>{address}</Box>
-          <Box sx={{ fontWeight: "bold" }}>Contract state:</Box>
-          <Box>{stateString}</Box>
-        </Box>
+        {isConnected ? (
+          <>
+            {isOwner ? (
+              <h1>You are connected as seller</h1>
+            ) : (
+              <h1>You are connected as buyer</h1>
+            )}
+            <Box
+              component="img"
+              sx={{
+                height: 442,
+                width: 612,
+                maxHeight: { xs: 233, md: 167 },
+                maxWidth: { xs: 350, md: 250 },
+              }}
+              alt="Car for sale."
+              src="car.jpeg"
+            />
+            <Box
+              sx={{
+                display: "inline-grid",
+                gridTemplateColumns: "auto auto",
+                gap: 1,
+                alignItems: "center",
+              }}
+            >
+              <Box sx={{ fontWeight: "bold" }}>Car price:</Box>
+              <Box>{price ? utils.formatEther(price) : undefined} ETH</Box>
+              <Box sx={{ fontWeight: "bold" }}>Escrow balance:</Box>
+              <Box>{balance} ETH</Box>
+              <Box sx={{ fontWeight: "bold" }}>Contract address:</Box>
+              <Box>{address}</Box>
+              <Box sx={{ fontWeight: "bold" }}>Contract state:</Box>
+              <Box>{stateString}</Box>
+            </Box>
+          </>
+        ) : (
+          <Box>Please connect your wallet.</Box>
+        )}
       </Box>
     </Box>
   );

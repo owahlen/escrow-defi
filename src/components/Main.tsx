@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { Chain, useEthers } from "@usedapp/core";
 import Typography from "@mui/material/Typography";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
 import { ContractDetails } from "./ContractDetails";
 import { ContractActions } from "./ContractActions";
+import { AlertContext } from "./AlertContext";
 
 export const Main = ({ supportedChains }: { supportedChains: Chain[] }) => {
-  const { error } = useEthers();
-
-  const [showNetworkError, setShowNetworkError] = useState(false);
+  const { account, error } = useEthers();
+  const { alertError, closeAlert, getAlertState } = useContext(AlertContext);
 
   /**
    * useEthers will return a populated 'error' field when something has gone wrong.
@@ -17,22 +15,23 @@ export const Main = ({ supportedChains }: { supportedChains: Chain[] }) => {
    * that the user is connected to the wrong network.
    */
   useEffect(() => {
-    if (error && error.name === "UnsupportedChainIdError") {
-      !showNetworkError && setShowNetworkError(true);
+    const unsupportedChainIdError = "UnsupportedChainIdError";
+    if (error && error.name === unsupportedChainIdError) {
+      const errorMessage =
+        "You have to connect your wallet to one of the supported networks: " +
+        supportedChains
+          .map((c) => c.chainName + "(" + c.chainId + ")")
+          .join(", ");
+      alertError(errorMessage, unsupportedChainIdError, null);
     } else {
-      showNetworkError && setShowNetworkError(false);
+      // if the unsupportedChainIdError is fixed immediately close the alert
+      if (getAlertState().id === unsupportedChainIdError) {
+        closeAlert();
+      }
     }
-  }, [error, showNetworkError]);
+  }, [alertError, closeAlert, error, getAlertState, supportedChains]);
 
-  const handleCloseNetworkError = (
-    event: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    showNetworkError && setShowNetworkError(false);
-  };
+  const isConnected = account !== undefined;
 
   return (
     <>
@@ -48,19 +47,7 @@ export const Main = ({ supportedChains }: { supportedChains: Chain[] }) => {
         Car Sale
       </Typography>
       <ContractDetails />
-      <ContractActions />
-      <Snackbar
-        open={showNetworkError}
-        autoHideDuration={5000}
-        onClose={handleCloseNetworkError}
-      >
-        <Alert onClose={handleCloseNetworkError} severity="warning">
-          You have to connect your wallet to one of the supported networks:{" "}
-          {supportedChains
-            .map((c) => c.chainName + "(" + c.chainId + ")")
-            .join(", ")}
-        </Alert>
-      </Snackbar>
+      {isConnected ? <ContractActions /> : null}
     </>
   );
 };

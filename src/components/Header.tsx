@@ -1,11 +1,11 @@
 import React from "react";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-import { useEthers } from "@usedapp/core";
+import { shortenAddress, useEthers, useLookupAddress } from "@usedapp/core";
 
 export const Header = () => {
   const { account, activateBrowserWallet, deactivate } = useEthers();
-  const isConnected = account !== undefined;
+  const ens = useLookupAddress();
   return (
     <Box
       sx={{
@@ -15,10 +15,10 @@ export const Header = () => {
         gap: 1,
       }}
     >
-      {isConnected ? (
+      {account ? (
         <>
           <Button color="secondary" variant="contained">
-            {`${account?.slice(0, 5)}...${account?.slice(-4)}`}
+            {ens ?? shortenAddress(account)}
           </Button>
           <Button color="primary" variant="contained" onClick={deactivate}>
             Disconnect

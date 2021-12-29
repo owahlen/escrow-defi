@@ -1,19 +1,17 @@
 import Box from "@mui/material/Box";
-import React from "react";
+import React, { useEffect } from "react";
 import { InactiveAction } from "./InactiveAction";
 import { PricedAction } from "./PricedAction";
 import { useEscrowState } from "../hooks/useEscrowState";
-import { useEscrowAddress } from "../hooks/useEscrowAddress";
 import { PaidAction } from "./PaidAction";
 import { SettledAction } from "./SettledAction";
+import { useNotifications } from "@usedapp/core";
 
 export const ContractActions = () => {
   const escrowState = useEscrowState();
-  const escrowAddress = useEscrowAddress();
+  const { notifications } = useNotifications();
 
-  if (!escrowAddress) {
-    return null;
-  }
+  useEffect(() => {}, [notifications]);
 
   return (
     <Box

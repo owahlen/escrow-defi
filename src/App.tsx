@@ -14,6 +14,7 @@ import { Header } from "./components/Header";
 import { Container } from "@mui/material";
 import { chainMap, getDeployedContract } from "./chain-info/deployment";
 import { MulticallAddresses } from "@usedapp/core/src/constants/type/Config";
+import { AlertProvider } from "./components/AlertContext";
 
 const supportedChains = DEFAULT_SUPPORTED_CHAINS.filter(
   (chain) => String(chain.chainId) in chainMap
@@ -39,10 +40,12 @@ const config: Config = {
 
 const App = () => (
   <DAppProvider config={config}>
-    <Header />
-    <Container maxWidth="md">
-      <Main supportedChains={supportedChains} />
-    </Container>
+    <AlertProvider>
+      <Header />
+      <Container maxWidth="md">
+        <Main supportedChains={supportedChains} />
+      </Container>
+    </AlertProvider>
   </DAppProvider>
 );
 

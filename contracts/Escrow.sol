@@ -116,6 +116,7 @@ contract Escrow {
             revert InvalidState();
         }
         emit Payout();
+        price = 0;
         state = State.Inactive;
         seller.transfer(address(this).balance);
     }
